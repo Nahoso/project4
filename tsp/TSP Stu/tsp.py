@@ -37,7 +37,23 @@ class TSP(Problem):
             self.dist.append(dist_)
 
         # Dummy initial solution. Change it to build your initial solution.
-        self.initial = list(range(self.n))
+        # self.initial = list(range(self.n))
+
+        # Greedy initial solution
+        self.initial = [0]  # Adding first city
+
+        visitable = list(range(self.n))  # Cities to visit
+        i = 0 # First city is 0
+        visitable.remove(i) # Retirer i de visitable
+        print(visitable)
+        while visitable:
+            nearest = visitable[0] # initialiser a la premiere ville la plus proche
+            for j in visitable:
+                if self.dist[j][i] < self.dist[j][nearest]: # nouvelle ville plus proche
+                    nearest = j
+            self.initial.append(nearest) # add nearest to the list
+            i = nearest # new city
+            visitable.remove(nearest) # remove nearest from cities to visit
 
 
     def successor(self, state):
@@ -55,8 +71,18 @@ class TSP(Problem):
         You should try to visualize this example, it will be more easier to see.
         You should reverse path between index i and index j to preserve other edges.
         """
-        
-        pass
+        print("successor")
+        new_state = state[:] # copy of the state
+        reversed_state = list(reversed(new_state))
+        for i in range(len(state)):
+            for j in range(len(state)):
+                if i != j-1 and i!= j+1 : # no city in common
+                    list(reversed(state[i:j])) # reversed part of the list
+                    new_state = state[:i] # start of the list identical
+                    new_state.extend(reversed_state) # reversed middle list
+                    new_state.extend(state[j:]) # end of the list indentical
+                    yield((i,j),new_state)
+
 
 
     def value(self, state):
@@ -64,9 +90,33 @@ class TSP(Problem):
         The value function must return an integer value
         representing the length of TSP route.
         """
+        i=-1
+        total_cost = 0
+        for _ in range(len(state)):
+            city_a = state[i]
+            city_b = state[i+1]
+            total_cost = total_cost+ self.dist[city_a][city_b]
+            i=i+1
+        return total_cost
 
-        return 0
 
+def max_node(list_node):
+    print(2)
+    best = list_node[0]
+    for current in list_node:
+        print(3)
+        if current.value() > best.value():
+            best = current
+    return best
+
+def max_first_node(list_node, nb_nodes): # min 1 node
+    best_list = [list_node[:nb_nodes]] # place les nb_node premiers dans la liste
+    for current in list_node:
+        for state in best_list:
+            if current.value() > state.value():
+                best_list.remove(state) # enleve de la liste l'ancien
+                best_list.append(current) # ajoute à la liste le nouveau
+    return best_list
 
 #################
 # Local Search #
@@ -74,19 +124,29 @@ class TSP(Problem):
 def maxvalue(problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     best = current
-    # Put your code here!
-
+    for step in range(limit):
+        print(1)
+        if callback is not None:
+            callback(current)
+        current = max_node(list(current.expand()))
+        if current.value() > best.value():
+            best = current
     return best
 
 
 def randomized_maxvalue(problem, limit=100, callback=None):
     # use this line to submit on INGInious
     # random.seed(12)
+
     current = LSNode(problem, problem.initial, 0)
     best = current
-    # Put your code here!
-
-
+    for step in range(limit):
+        if callback is not None:
+            callback(current)
+        max_5_nodes=max_first_node(list(current.expand(),5))
+        current = random.choice(max_5_nodes)
+        if current.value() > best.value():
+            best = current
     return best
 
 
