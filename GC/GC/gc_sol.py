@@ -22,5 +22,21 @@ def get_clauses(G, k):
 
     clauses = []
     # Put your code here!
+    # First We add the clauses that check that two linked nodes do not have the same color 
+    # Ex: for k colors, node i and adjacent nodes a,b,c: (!V_i_0 || !V_a_0) && (!V_i_1 || !V_a_1) && ... && (!V_i_k || !V_c_k)
+    index = 0
+    for adjN in G.adjacent:
+        for node in adjN:
+            for color in range(1,k+1):
+                clauses.append([-((index-1)*k + color), -((node-1)*k + color)])
+        index += 1
 
+
+    # Then we add the clauses that check that a node has a color
+    # Ex: for k colors, node i: V_i_0 || V_i_1 || ... || V_i_k
+    for n in range(1,G.nb_nodes+1):
+        unicityColor = [] 
+        for color in range(1,k+1):
+            unicityColor.append(((n-1)*k + color))
+        clauses.append(unicityColor)    
     return clauses
