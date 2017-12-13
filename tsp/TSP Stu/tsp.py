@@ -57,29 +57,30 @@ class TSP(Problem):
 
     def successor(self, state):
         """
-        For successor(self, state) function, you should return a list of (act, succ) 
-        where the state succ is obtained by apply the action act, in this case, act = (i, j) 
-        consists in applying 2-opt swap on the two edges (state[i-1], state[i]) and  (state[j], state[j+1]). 
+        For successor(self, state) function, you should return a list of (act, succ)
+        where the state succ is obtained by apply the action act, in this case, act = (i, j)
+        consists in applying 2-opt swap on the two edges (state[i-1], state[i]) and  (state[j], state[j+1]).
         (state here is an ordered sequence of visited cities)
 
         For example, consider the following state:
         state = [7, 2, 1, 5, 4, 3, 0, 6]
         One possible successor of this state could be ((1,5), succ), with:
         succ = [7, 3, 4, 5, 1, 2, 0, 6]
-        Since act = (1, 5), it means that the two edges (7, 2) and (3,0) have been swapped in succ. 
+        Since act = (1, 5), it means that the two edges (7, 2) and (3,0) have been swapped in succ.
         You should try to visualize this example, it will be more easier to see.
         You should reverse path between index i and index j to preserve other edges.
         """
-        print("successor")
         new_state = state[:] # copy of the state
-        reversed_state = list(reversed(new_state))
-        for i in range(len(state)):
-            for j in range(len(state)):
-                if i != j-1 and i!= j+1 : # no city in common
-                    list(reversed(state[i:j])) # reversed part of the list
+        for i in range(self.n):
+            for j in range(1, self.n):
+                if i<j and i!= j+1 : # no city in common
+                    reversed_state = list(reversed(state[i:j])) # reversed part of the list
+
                     new_state = state[:i] # start of the list identical
                     new_state.extend(reversed_state) # reversed middle list
                     new_state.extend(state[j:]) # end of the list indentical
+
+                    # print(new_state)
                     yield((i,j),new_state)
 
 
@@ -91,12 +92,14 @@ class TSP(Problem):
         """
         i=-1
         total_cost = 0
-        for _ in range(len(state)):
+        for _ in range(self.n):
             city_a = state[i]
             city_b = state[i+1]
             total_cost = total_cost+ self.dist[city_a][city_b]
             i=i+1
         return total_cost
+
+
 def value_list(self, state):
     i=-1
     total_cost = 0
@@ -109,13 +112,11 @@ def value_list(self, state):
 
 
 def max_node(list_node):
-    print(2)
     best = list_node[0]
-    print(len(list_node))
     for current in list_node:
 
 
-        if current.value() > best.value():
+        if current.value() < best.value():
             best = current
     return best
 
@@ -128,11 +129,10 @@ def maxvalue(problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     best = current
     for step in range(limit):
-        print(1)
         if callback is not None:
             callback(current)
         current = max_node(list(current.expand()))
-        if current.value() > best.value():
+        if current.value() < best.value():
             best = current
     return best
 
@@ -170,7 +170,7 @@ if __name__ == '__main__':
         exit(1)
 
     tsp = TSP(sys.argv[1])
-    node = randomized_maxvalue(tsp, 100)
+    node = maxvalue(tsp, 2)
 
     # prepare output data to printout
     output_data = '%.2f' % tsp.value(tsp.initial) + '\n'
