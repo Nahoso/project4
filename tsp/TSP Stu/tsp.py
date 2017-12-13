@@ -69,31 +69,22 @@ class TSP(Problem):
         You should try to visualize this example, it will be more easier to see.
         You should reverse path between index i and index j to preserve other edges.
         """
-        new_state = state[:] # copy of the state
         for i in range(self.n):
             for j in range(1, self.n):
-                if i<j and i!= j+1 : # no city in common
-                    reversed_state = list(reversed(state[i:j])) # reversed part of the list
+                if i<j: # no city in common
+                    reversed_state = list(reversed(state[i:j+1])) # reversed part of the list
                     new_state = state[:i] # start of the list identical
                     new_state.extend(reversed_state) # reversed middle list
-                    new_state.extend(state[j:]) # end of the list indentical
+                    new_state.extend(state[j+1:]) # end of the list indentical
                     yield((i,j),new_state)
 
-
-
-
     def value(self, state):
-        """
-        The value function must return an integer value
-        representing the length of TSP route.
-        """
-        i=-1
         total_cost = 0
-        for _ in range(self.n):
-            city_a = state[i]
-            city_b = state[i+1]
-            total_cost = total_cost+ self.dist[city_a][city_b]
-            i=i+1
+        for i in range(self.n):
+            if i == len(state) - 1:
+                total_cost += self.dist[state[i]][state[0]]
+            else:
+                total_cost += self.dist[state[i]][state[i+1]]
         return total_cost
 
 
@@ -118,6 +109,7 @@ def maxvalue(problem, limit=100, callback=None):
         current = max_node(list(current.expand()))
         if current.value() < best.value():
             best = current
+
     return best
 
 
