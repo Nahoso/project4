@@ -53,7 +53,6 @@ class TSP(Problem):
             self.initial.append(nearest) # add nearest to the list
             i = nearest # new city
             visitable.remove(nearest) # remove nearest from cities to visit
-        print(self.initial)
 
     def successor(self, state):
         """
@@ -75,13 +74,17 @@ class TSP(Problem):
             for j in range(1, self.n):
                 if i<j and i!= j+1 : # no city in common
                     reversed_state = list(reversed(state[i:j])) # reversed part of the list
-
                     new_state = state[:i] # start of the list identical
+                    print(1)
+                    print(new_state)
                     new_state.extend(reversed_state) # reversed middle list
+                    print(2)
+                    print(new_state)
                     new_state.extend(state[j:]) # end of the list indentical
-
-                    # print(new_state)
+                    print(3)
+                    print(new_state)
                     yield((i,j),new_state)
+
 
 
 
@@ -142,22 +145,19 @@ def randomized_maxvalue(problem, limit=100, callback=None):
     # random.seed(12)
 
     current = LSNode(problem, problem.initial, 0)
+    print(current)
     print(current.value())
     best = current
     for step in range(limit):
         if callback is not None:
             callback(current)
         list_node = list(current.expand())
-        list_state = []
+        best_list = list_node[:5]  # place les nb_node premiers dans la liste
         for node in list_node:
-            list_state.append(node.value()) #list of states
-        print(list_state)
-        best_list = [list_state[:5]]  # place les nb_node premiers dans la liste
-        for current in list_state:
             for best_current in best_list:
-                if current.value() < best_current.value():
+                if node.value() < best_current.value():
                     best_list.remove(best_current)  # enleve de la liste l'ancien
-                    best_list.append(current)  # ajoute à la liste le nouveau
+                    best_list.append(node)  # ajoute à la liste le nouveau
         current = random.choice(best_list)
         if problem.value(current.value()) < problem.value(best.value()):
             best = current
