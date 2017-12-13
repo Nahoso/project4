@@ -75,14 +75,8 @@ class TSP(Problem):
                 if i<j and i!= j+1 : # no city in common
                     reversed_state = list(reversed(state[i:j])) # reversed part of the list
                     new_state = state[:i] # start of the list identical
-                    print(1)
-                    print(new_state)
                     new_state.extend(reversed_state) # reversed middle list
-                    print(2)
-                    print(new_state)
                     new_state.extend(state[j:]) # end of the list indentical
-                    print(3)
-                    print(new_state)
                     yield((i,j),new_state)
 
 
@@ -103,26 +97,13 @@ class TSP(Problem):
         return total_cost
 
 
-def value_list(self, state):
-    i=-1
-    total_cost = 0
-    for _ in range(len(state)):
-        city_a = state[i]
-        city_b = state[i+1]
-        total_cost = total_cost+ self.dist[city_a][city_b]
-        i=i+1
-    return total_cost
-
-
 def max_node(list_node):
     best = list_node[0]
     for current in list_node:
 
-
         if current.value() < best.value():
             best = current
     return best
-
 
 
 #################
@@ -170,7 +151,7 @@ if __name__ == '__main__':
         exit(1)
 
     tsp = TSP(sys.argv[1])
-    node = maxvalue(tsp, 2)
+    node = maxvalue(tsp, 100)
 
     # prepare output data to printout
     output_data = '%.2f' % tsp.value(tsp.initial) + '\n'
