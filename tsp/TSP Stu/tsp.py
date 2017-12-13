@@ -45,16 +45,15 @@ class TSP(Problem):
         visitable = list(range(self.n))  # Cities to visit
         i = 0 # First city is 0
         visitable.remove(i) # Retirer i de visitable
-        print(visitable)
         while visitable:
             nearest = visitable[0] # initialiser a la premiere ville la plus proche
             for j in visitable:
-                if self.dist[j][i] < self.dist[j][nearest]: # nouvelle ville plus proche
+                if self.dist[j][i] < self.dist[i][nearest]: # nouvelle ville plus proche
                     nearest = j
             self.initial.append(nearest) # add nearest to the list
             i = nearest # new city
             visitable.remove(nearest) # remove nearest from cities to visit
-
+        print(self.initial)
 
     def successor(self, state):
         """
@@ -98,25 +97,29 @@ class TSP(Problem):
             total_cost = total_cost+ self.dist[city_a][city_b]
             i=i+1
         return total_cost
+def value_list(self, state):
+    i=-1
+    total_cost = 0
+    for _ in range(len(state)):
+        city_a = state[i]
+        city_b = state[i+1]
+        total_cost = total_cost+ self.dist[city_a][city_b]
+        i=i+1
+    return total_cost
 
 
 def max_node(list_node):
     print(2)
     best = list_node[0]
+    print(len(list_node))
     for current in list_node:
-        print(3)
+
+
         if current.value() > best.value():
             best = current
     return best
 
-def max_first_node(list_node, nb_nodes): # min 1 node
-    best_list = [list_node[:nb_nodes]] # place les nb_node premiers dans la liste
-    for current in list_node:
-        for state in best_list:
-            if current.value() > state.value():
-                best_list.remove(state) # enleve de la liste l'ancien
-                best_list.append(current) # ajoute à la liste le nouveau
-    return best_list
+
 
 #################
 # Local Search #
@@ -139,13 +142,24 @@ def randomized_maxvalue(problem, limit=100, callback=None):
     # random.seed(12)
 
     current = LSNode(problem, problem.initial, 0)
+    print(current.value())
     best = current
     for step in range(limit):
         if callback is not None:
             callback(current)
-        max_5_nodes=max_first_node(list(current.expand(),5))
-        current = random.choice(max_5_nodes)
-        if current.value() > best.value():
+        list_node = list(current.expand())
+        list_state = []
+        for node in list_node:
+            list_state.append(node.value()) #list of states
+        print(list_state)
+        best_list = [list_state[:5]]  # place les nb_node premiers dans la liste
+        for current in list_state:
+            for best_current in best_list:
+                if current.value() < best_current.value():
+                    best_list.remove(best_current)  # enleve de la liste l'ancien
+                    best_list.append(current)  # ajoute à la liste le nouveau
+        current = random.choice(best_list)
+        if problem.value(current.value()) < problem.value(best.value()):
             best = current
     return best
 
@@ -156,7 +170,7 @@ if __name__ == '__main__':
         exit(1)
 
     tsp = TSP(sys.argv[1])
-    node = maxvalue(tsp, 100)
+    node = randomized_maxvalue(tsp, 100)
 
     # prepare output data to printout
     output_data = '%.2f' % tsp.value(tsp.initial) + '\n'
